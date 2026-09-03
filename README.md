@@ -260,7 +260,7 @@ page cache but deliberately leaves settings behind, in case of a reinstall.
 
 ## Licence
 
-The code is MIT — see [LICENSE](LICENSE).
+The code is MIT — see [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
 The merit badge requirement text is not, and cannot be: it belongs to Scouting
 America. It is reproduced here (in `mbworkbook/data/requirements.json` and in

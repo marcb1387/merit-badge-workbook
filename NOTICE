@@ -1,0 +1,14 @@
+Merit Badge Workbook
+Copyright (c) 2026 marcb1387
+
+The MIT licence in LICENSE covers the source code of this project.
+
+It does not cover the merit badge requirement text, which belongs to Scouting
+America. That text is reproduced here for the convenience of Scouts and
+counselors - in mbworkbook/data/requirements.json, and in the files this
+program generates. The official, current requirements are the ones published
+at scouting.org and in the current merit badge pamphlet.
+
+"Scouting America", "Boy Scouts of America", "Eagle Scout" and the merit badge
+names are marks of Scouting America. This project is not affiliated with,
+endorsed by, or sponsored by Scouting America.

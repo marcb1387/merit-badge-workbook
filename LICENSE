@@ -19,17 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-The MIT licence above covers the source code of this project.
-
-It does not cover the merit badge requirement text, which belongs to Scouting
-America. That text is reproduced here for the convenience of Scouts and
-counselors — in `mbworkbook/data/requirements.json`, and in the files this
-program generates. The official, current requirements are the ones published
-at scouting.org and in the current merit badge pamphlet.
-
-"Scouting America", "Boy Scouts of America", "Eagle Scout" and the merit badge
-names are marks of Scouting America. This project is not affiliated with,
-endorsed by, or sponsored by Scouting America.
