@@ -1,0 +1,6 @@
+# Keep the repository normalized to LF; check out native line endings.
+* text=auto
+
+# Binary assets git must never line-ending-convert.
+*.pdf binary
+*.png binary

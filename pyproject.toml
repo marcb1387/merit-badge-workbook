@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "merit-badge-workbook"
+version = "0.1.0"
+description = "Printable requirements checklists and note-taking workbooks for Scouting America merit badges"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.28",
+    "beautifulsoup4>=4.11",
+    "lxml>=4.9",
+]
+
+[project.optional-dependencies]
+pdf = ["reportlab>=4.0"]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+mbworkbook = "mbworkbook.cli:main"
+
+[project.gui-scripts]
+mbworkbook-gui = "mbworkbook.gui:main"
+
+[tool.setuptools.packages.find]
+include = ["mbworkbook*"]
