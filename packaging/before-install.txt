@@ -1,0 +1,22 @@
+Merit Badge Workbook prints requirement checklists, note-taking workbooks and
+blue cards for Scouting America merit badges.
+
+Please read this before you hand anything it prints to a Scout.
+
+THE REQUIREMENTS ARE A SNAPSHOT
+This app ships a copy of every badge's requirements, taken on the date shown
+on the Options tab and printed on every sheet it generates. Requirements
+change. Use Requirements > Check for updates before each new class rather
+than trusting the built-in copy indefinitely.
+
+THE OFFICIAL REQUIREMENTS ARE NOT THESE
+The requirement text belongs to Scouting America. These sheets are a
+note-taking aid for Scouts and counselors. The official, current requirements
+are the ones at scouting.org and in the current merit badge pamphlet. Do not
+pass the generated files off as official workbooks.
+
+BLUE CARDS ARE UNOFFICIAL
+The card this app draws is marked unofficial on every panel, and a council's
+fillable form filled in by this app is still a printout. Some councils accept
+printed cards and some require the pre-printed stock from the Scout shop.
+Check with yours before a Scout carries one to a board of review.

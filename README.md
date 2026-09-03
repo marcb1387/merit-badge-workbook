@@ -230,6 +230,34 @@ lines starting with `Resources:` become notes rather than requirements.
   ones on scouting.org and in the current pamphlet. Don't redistribute the
   generated files as if they were official workbooks.
 
+## Building the Windows app
+
+The released app is a PyInstaller bundle wrapped in an Inno Setup installer, so
+a unit volunteer never has to see Python.
+
+```powershell
+python tools/build_snapshot.py                       # refresh the requirements
+python -m PyInstaller packaging/mbworkbook.spec --noconfirm
+& "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe" packaging\installer.iss
+```
+
+That leaves `dist\MeritBadgeWorkbook\` (the runnable bundle) and
+`dist\MeritBadgeWorkbook-<version>-Setup.exe` (the installer).
+
+The bundle carries two executables sharing one copy of the Qt runtime:
+`MeritBadgeWorkbook.exe` is the window, with no console behind it, and
+`mbworkbook.exe` is the same CLI for scripting a batch.
+
+It is `--onedir`, not `--onefile`, on purpose: a onefile build unpacks the
+whole Qt runtime to a temp directory on every launch, which is slow and is a
+reliable way to get flagged by antivirus heuristics. The installer hides the
+directory anyway. The spec also drops the Qt modules nothing here uses (QML,
+WebEngine, 3D, multimedia), which roughly halves the result.
+
+The installer is per-user (`PrivilegesRequired=lowest`), so it needs no admin
+rights — the usual case on a school or work laptop. Uninstalling removes the
+page cache but deliberately leaves settings behind, in case of a reinstall.
+
 ## Tests
 
 ```bash

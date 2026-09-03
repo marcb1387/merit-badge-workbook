@@ -21,9 +21,12 @@ def _require_reportlab():
         from reportlab.lib import colors  # noqa: F401
         from reportlab.lib.pagesizes import letter  # noqa: F401
     except ImportError as exc:  # pragma: no cover
+        # Name the failing import. A frozen build can ship every reportlab
+        # module and still land here because a dependency of it was left out,
+        # and "install reportlab" sends you looking in the wrong place.
         raise SystemExit(
-            "PDF output needs reportlab. Install it with:\n"
-            "    pip install reportlab"
+            f"PDF output needs reportlab, and importing it failed: {exc}\n"
+            f"    pip install reportlab"
         ) from exc
 
 

@@ -41,8 +41,8 @@ def _require_reportlab():
         from reportlab.lib.pagesizes import letter  # noqa: F401
     except ImportError as exc:  # pragma: no cover
         raise SystemExit(
-            "Blue card output needs reportlab. Install it with:\n"
-            "    pip install reportlab"
+            f"Blue card output needs reportlab, and importing it failed: {exc}\n"
+            f"    pip install reportlab"
         ) from exc
 
 
