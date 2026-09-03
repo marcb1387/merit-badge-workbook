@@ -45,10 +45,8 @@ ArchitecturesInstallIn64BitMode=x64compatible
 
 UninstallDisplayName={#AppName}
 UninstallDisplayIcon={app}\{#GuiExe}
+LicenseFile=..\LICENSE
 InfoBeforeFile=before-install.txt
-; No LicenseFile: the project has not chosen a licence yet. Add one and
-; uncomment this before distributing outside your own unit.
-;LicenseFile=..\LICENSE
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

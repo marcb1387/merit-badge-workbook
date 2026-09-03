@@ -7,6 +7,8 @@ name = "merit-badge-workbook"
 version = "1.1.0"
 description = "Printable requirement checklists, workbooks and blue cards for Scouting America merit badges"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
     "requests>=2.28",

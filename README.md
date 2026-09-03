@@ -258,6 +258,17 @@ The installer is per-user (`PrivilegesRequired=lowest`), so it needs no admin
 rights — the usual case on a school or work laptop. Uninstalling removes the
 page cache but deliberately leaves settings behind, in case of a reinstall.
 
+## Licence
+
+The code is MIT — see [LICENSE](LICENSE).
+
+The merit badge requirement text is not, and cannot be: it belongs to Scouting
+America. It is reproduced here (in `mbworkbook/data/requirements.json` and in
+everything this program generates) as a note-taking aid for Scouts and
+counselors. The official, current requirements are the ones at scouting.org and
+in the current pamphlet. This project is not affiliated with or endorsed by
+Scouting America.
+
 ## Tests
 
 ```bash
