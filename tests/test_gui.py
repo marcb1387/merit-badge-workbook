@@ -1,13 +1,12 @@
-"""Tests for the pieces the GUI leans on.
+"""Tests for the service layer the GUI and CLI share.
 
-The window itself needs a display, so these cover the parts that do not:
-the background-job plumbing and the shared service layer.
+The window itself needs a display, so it is not exercised here; the background
+job plumbing it uses lives in test_paths_and_jobs.py.
 """
 
 from __future__ import annotations
 
 import sys
-import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -19,64 +18,11 @@ from mbworkbook.render import WorkbookOptions  # noqa: E402
 from mbworkbook.service import (  # noqa: E402
     fetch_badge,
     output_filename,
+    write_cards,
     write_output,
 )
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_badge.html"
-
-
-def drain(worker, timeout: float = 3.0) -> list:
-    """Collect every queued message until the worker signals it is done."""
-    messages = []
-    deadline = time.time() + timeout
-    while time.time() < deadline:
-        while not worker.queue.empty():
-            msg = worker.queue.get_nowait()
-            messages.append(msg)
-            if msg.kind == "done":
-                return messages
-        time.sleep(0.01)
-    raise AssertionError("worker never finished")
-
-
-def worker_class():
-    try:
-        from mbworkbook.gui import Worker
-    except SystemExit:  # tkinter missing
-        pytest.skip("tkinter is not installed")
-    return Worker
-
-
-# ---------------------------------------------------------------- worker
-
-
-def test_worker_reports_results_then_done():
-    worker = worker_class()()
-    worker.start(lambda: worker.send("log", "hello"))
-    kinds = [m.kind for m in drain(worker)]
-    assert kinds == ["log", "done"]
-
-
-def test_worker_turns_exceptions_into_error_messages():
-    worker = worker_class()()
-
-    def boom():
-        raise ValueError("nope")
-
-    worker.start(boom)
-    messages = drain(worker)
-    error = next(m for m in messages if m.kind == "error")
-    assert "ValueError: nope" in str(error.payload)
-    # A failed job must still report done, or the UI stays stuck on "busy".
-    assert messages[-1].kind == "done"
-
-
-def test_worker_refuses_a_second_job_while_busy():
-    Worker = worker_class()
-    worker = Worker()
-    worker.start(lambda: time.sleep(0.25))
-    assert worker.start(lambda: worker.send("log", "should not run")) is False
-    drain(worker)
 
 
 # ---------------------------------------------------------------- service
@@ -114,3 +60,48 @@ def test_write_output_creates_a_file_in_every_format(tmp_path, fmt):
         tmp_path / "nested" / output_filename(badge, "workbook", fmt),
     )
     assert path.exists() and path.stat().st_size > 0
+
+
+# ------------------------------------------------------------------ cards
+
+
+def test_write_cards_draws_its_own_card_without_a_template(tmp_path):
+    badge = fetch_badge(None, html_file=FIXTURE)
+    path = write_cards([badge], WorkbookOptions(scout="A. Scout"),
+                       tmp_path / "cards.pdf")
+    assert path.exists() and path.stat().st_size > 0
+    assert path.read_bytes().startswith(b"%PDF")
+
+
+def test_write_cards_packs_several_badges_into_one_file(tmp_path):
+    badge = fetch_badge(None, html_file=FIXTURE)
+    one = write_cards([badge], WorkbookOptions(), tmp_path / "one.pdf")
+    many = write_cards([badge] * 5, WorkbookOptions(), tmp_path / "many.pdf")
+    assert many.stat().st_size > one.stat().st_size
+
+
+def test_card_filename_is_not_the_checklist_filename():
+    badge = Badge(name="Widgetry", slug="widgetry", url="u")
+    assert output_filename(badge, "checklist", "card") == "widgetry-blue-card.pdf"
+    assert output_filename(badge, "workbook", "card") == "widgetry-blue-card.pdf"
+
+
+def test_a_template_that_is_not_a_blue_card_is_rejected(tmp_path):
+    """Better a clear error than a stack of blank forms."""
+    from mbworkbook.render.cardform import TemplateError, fill_template, looks_like_template
+
+    badge = fetch_badge(None, html_file=FIXTURE)
+    decoy = write_output(badge, WorkbookOptions(), "pdf", tmp_path / "decoy.pdf")
+
+    assert looks_like_template(decoy) is False
+    assert looks_like_template(tmp_path / "missing.pdf") is False
+    with pytest.raises(TemplateError):
+        fill_template(decoy, [badge], WorkbookOptions(), str(tmp_path / "out.pdf"))
+
+
+def test_unit_number_is_pulled_out_of_the_unit_name():
+    from mbworkbook.render.cardform import _unit_number
+
+    assert _unit_number("Troop 379") == "379"
+    assert _unit_number("Crew 1") == "1"
+    assert _unit_number("") == ""

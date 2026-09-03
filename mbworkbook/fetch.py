@@ -9,13 +9,11 @@ from pathlib import Path
 
 import requests
 
+from .paths import cache_dir as _cache_dir
+
 USER_AGENT = (
     "merit-badge-workbook/1.0 (+troop volunteer tool; "
     "contact: set MBW_CONTACT env var)"
-)
-
-DEFAULT_CACHE_DIR = Path(
-    os.environ.get("MBW_CACHE_DIR", Path.home() / ".cache" / "merit-badge-workbook")
 )
 
 # Be gentle: scouting.org is a volunteer-facing site, not an API.
@@ -41,7 +39,7 @@ def get_html(
     timeout: int = 30,
 ) -> str:
     """Return page HTML, using the cache when it is fresh enough."""
-    cache_dir = Path(cache_dir) if cache_dir else DEFAULT_CACHE_DIR
+    cache_dir = Path(cache_dir) if cache_dir else _cache_dir()
     cache_dir.mkdir(parents=True, exist_ok=True)
     path = _cache_path(url, cache_dir)
 

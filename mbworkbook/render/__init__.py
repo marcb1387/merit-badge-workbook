@@ -26,6 +26,7 @@ class WorkbookOptions:
     note_lines: int = 4  # ruled lines per requirement in workbook style
     show_signoff: bool = True  # date + initials columns
     include_notes: bool = True  # keep "Resources:" lines from the page
+    card_template: str = ""  # fillable blue card PDF to fill instead of drawing one
 
 
 def visible_notes(req: Requirement, options: WorkbookOptions) -> list[str]:

@@ -10,7 +10,15 @@ from .catalog import load_catalog, resolve
 from .fetch import FetchError
 from .models import Badge
 from .render import WorkbookOptions
-from .service import EXTENSIONS, fetch_badge, output_filename, write_output
+from .service import (
+    EXTENSIONS,
+    catalog_entries,
+    fetch_badge,
+    output_filename,
+    snapshot,
+    write_output,
+)
+from .snapshot import check_for_updates
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -63,6 +71,14 @@ def build_parser() -> argparse.ArgumentParser:
                    help="Ignore the cache and re-fetch from scouting.org.")
     p.add_argument("--dump-html", type=Path,
                    help="Save the fetched page HTML here (useful when parsing fails).")
+    p.add_argument("--card-template", type=Path, default=None,
+                   help="Fillable blue card PDF to fill (for -f card). Without "
+                        "one, a card is drawn from scratch.")
+    p.add_argument("--check-updates", action="store_true",
+                   help="Re-fetch every badge and report what has changed since "
+                        "the built-in requirements were built, then exit.")
+    p.add_argument("--online", action="store_true",
+                   help="Ignore the built-in requirements and fetch from the site.")
     p.add_argument("--quiet", action="store_true", help="Suppress progress output.")
     return p
 
@@ -108,6 +124,47 @@ def default_path(badge: Badge, args) -> Path:
     return Path(name)
 
 
+def _check_updates(catalog, *, quiet: bool) -> int:
+    """Compare the built-in requirements against the live site."""
+    CR = "\r"  # rewrite the progress line in place
+    snap = snapshot()
+    if not snap:
+        print("error: this build has no built-in requirements to compare.",
+              file=sys.stderr)
+        return 2
+
+    total = len(catalog)
+    print(f"Checking {total} badges against scouting.org "
+          f"(built-in copy built {snap.built_date}). This takes a few minutes.")
+
+    def progress(index, entry):
+        if not quiet:
+            print(f"  [{index}/{total}] {entry.name}", end="\r", file=sys.stderr, flush=True)
+
+    report = check_for_updates(
+        snap, catalog,
+        fetch=lambda e: fetch_badge(e, refresh=True, offline=False),
+        on_progress=progress,
+    )
+    if not quiet:
+        print(" " * 60, end="\r", file=sys.stderr)
+
+    print(report.summary())
+    for slug in report.changed:
+        print(f"  changed: {slug}")
+    for slug in report.added:
+        print(f"  new on the site: {slug}")
+    for slug in report.removed:
+        print(f"  no longer listed: {slug}")
+    for line in report.failed:
+        print(f"  ! {line}", file=sys.stderr)
+
+    if report.any_changes:
+        print("\nRe-run with --refresh for those badges, or rebuild the "
+              "built-in copy with tools/build_snapshot.py.")
+    return 1 if report.any_changes else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
@@ -124,20 +181,25 @@ def main(argv: list[str] | None = None) -> int:
         note_lines=max(0, args.note_lines),
         show_signoff=not args.no_signoff,
         include_notes=not args.no_resources,
+        card_template=str(args.card_template) if args.card_template else "",
     )
 
     # A local file can be parsed without touching the network at all.
     offline_single = args.html_file and not (args.list or args.all or args.pick or args.badge)
+    use_snapshot = not (args.online or args.refresh)
     catalog = []
     if not offline_single:
         try:
-            catalog = load_catalog(force_refresh=args.refresh)
+            catalog = catalog_entries(refresh=args.refresh, offline=use_snapshot)
         except FetchError as exc:
             if not args.html_file:
                 print(f"error: {exc}", file=sys.stderr)
                 return 2
         if args.eagle_only:
             catalog = [e for e in catalog if e.eagle_required]
+
+    if args.check_updates:
+        return _check_updates(catalog, quiet=args.quiet)
 
     if args.list:
         for entry in catalog:

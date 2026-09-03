@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "merit-badge-workbook"
-version = "0.1.0"
-description = "Printable requirements checklists and note-taking workbooks for Scouting America merit badges"
+version = "1.1.0"
+description = "Printable requirement checklists, workbooks and blue cards for Scouting America merit badges"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -16,7 +16,11 @@ dependencies = [
 
 [project.optional-dependencies]
 pdf = ["reportlab>=4.0"]
-dev = ["pytest>=7.0"]
+gui = ["PySide6>=6.6"]
+# Filling a council's fillable blue card PDF. The template is not shipped.
+cards = ["pypdf>=4.0"]
+app = ["reportlab>=4.0", "PySide6>=6.6", "pypdf>=4.0"]
+dev = ["pytest>=7.0", "reportlab>=4.0", "PySide6>=6.6", "pypdf>=4.0"]
 
 [project.scripts]
 mbworkbook = "mbworkbook.cli:main"
@@ -26,3 +30,7 @@ mbworkbook-gui = "mbworkbook.gui:main"
 
 [tool.setuptools.packages.find]
 include = ["mbworkbook*"]
+
+[tool.setuptools.package-data]
+# The prebuilt requirements snapshot ships inside the package.
+mbworkbook = ["data/*.json"]
